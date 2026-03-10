@@ -1,0 +1,46 @@
+{
+    "name": "i18readme",
+    "version": "1.0.0",
+    "description": "AI-powered README localization — translates and links README files across languages",
+    "main": "src/index.js",
+    "bin": {
+        "i18r": "bin/i18r.js",
+        "i18readme": "bin/i18r.js"
+    },
+    "files": [
+        "bin",
+        "src",
+        "README.md",
+        "LICENSE"
+    ],
+    "keywords": [
+        "readme",
+        "i18n",
+        "translate",
+        "localization",
+        "ai",
+        "markdown",
+        "claude",
+        "openai",
+        "cli"
+    ],
+    "license": "MIT",
+    "engines": {
+        "node": ">=18"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Timolio/i18readme.git"
+    },
+    "homepage": "https://github.com/Timolio/i18readme#readme",
+    "bugs": {
+        "url": "https://github.com/Timolio/i18readme/issues"
+    },
+    "dependencies": {
+        "@clack/prompts": "^0.10.0"
+    },
+    "optionalDependencies": {
+        "@anthropic-ai/sdk": "^0.39.0",
+        "openai": "^4.0.0"
+    }
+}
