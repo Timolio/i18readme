@@ -84,15 +84,6 @@ Lancez `i18r config` pour choisir un fournisseur et enregistrer votre clé. La c
 
 ---
 
-## Fichiers
-
-| Fichier           | Description                          |
-| ----------------- | ------------------------------------ |
-| `.i18readme.json` | Configuration du projet — à commiter |
-| `~/.i18readmerc`  | Votre clé API — ne jamais commiter   |
-
----
-
 ## Licence
 
 MIT

@@ -84,15 +84,6 @@ Mit `i18r config` wählst du einen Anbieter und speicherst deinen Key. Der Key w
 
 ---
 
-## Dateien
-
-| Datei             | Beschreibung                                 |
-| ----------------- | -------------------------------------------- |
-| `.i18readme.json` | Projekteinstellungen — gehört ins Repository |
-| `~/.i18readmerc`  | Dein API-Key — niemals committen             |
-
----
-
 ## Lizenz
 
 MIT

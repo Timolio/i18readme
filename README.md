@@ -84,15 +84,6 @@ Run `i18r config` to pick a provider and save your key. The key is stored in `~/
 
 ---
 
-## Files
-
-| File              | What it is                     |
-| ----------------- | ------------------------------ |
-| `.i18readme.json` | Project settings — commit this |
-| `~/.i18readmerc`  | Your API key — never commit    |
-
----
-
 ## License
 
 MIT
