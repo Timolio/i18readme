@@ -1,8 +1,14 @@
 <!-- i18readme -->
+
 **English** | [Русский](i18readme/README.ru.md) | [Deutsch](i18readme/README.de.md) | [Français](i18readme/README.fr.md) | [中文](i18readme/README.zh.md) | [日本語](i18readme/README.ja.md)
+
 <!-- i18readme -->
 
 # i18readme
+
+[![npm](https://img.shields.io/npm/v/i18readme)](https://www.npmjs.com/package/i18readme)
+[![npm downloads](https://img.shields.io/npm/dm/i18readme)](https://www.npmjs.com/package/i18readme)
+[![node](https://img.shields.io/node/v/i18readme)](https://www.npmjs.com/package/i18readme)
 
 Translate your `README.md` into any language with one command. Powered by Claude or GPT-4o.
 
@@ -74,10 +80,10 @@ i18r config set --provider <p> --key <k>   Save API key non-interactively
 
 ## AI providers
 
-| Provider           | Default model              | How to get a key                                       |
-| ------------------ | -------------------------- | ------------------------------------------------------ |
-| Claude _(default)_ | claude-haiku-4-5 (fast)    | [console.anthropic.com](https://console.anthropic.com) |
-| OpenAI             | gpt-4o-mini (fast)         | [platform.openai.com](https://platform.openai.com)     |
+| Provider           | Default model           | How to get a key                                       |
+| ------------------ | ----------------------- | ------------------------------------------------------ |
+| Claude _(default)_ | claude-haiku-4-5 (fast) | [console.anthropic.com](https://console.anthropic.com) |
+| OpenAI             | gpt-4o-mini (fast)      | [platform.openai.com](https://platform.openai.com)     |
 
 You can select a more powerful model (Sonnet, Opus, GPT-4o) during `i18r init` or `i18r config`, or override it for a single run with `--model`.
 
