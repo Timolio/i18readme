@@ -26,13 +26,10 @@ Requires Node.js 18+.
 # 1. Go to your project
 cd my-project
 
-# 2. Set up (interactive — asks for languages, folder, README files)
+# 2. Set up — asks for languages, folder, AI provider, model, and API key
 i18r init
 
-# 3. Add your API key (Claude or OpenAI)
-i18r config
-
-# 4. Translate
+# 3. Translate
 i18r sync
 ```
 
@@ -43,19 +40,23 @@ That's it. Your translations will appear in `i18readme/README.ru.md`, `i18readme
 ## Commands
 
 ```
-i18r init              Set up the project (interactive)
-i18r sync              Translate missing and outdated files
-i18r sync --force      Re-translate everything
-i18r status            Show what's up to date and what's not
-i18r config            Add or change your API key (interactive)
-i18r config show       Show saved config
+i18r init                          Set up the project (interactive)
+i18r sync                          Translate missing and outdated files
+i18r sync --force                  Re-translate everything
+i18r sync --force ru,de            Re-translate specific languages only
+i18r sync --provider <p>           Override provider for this run
+i18r sync --model <m>              Override model for this run
+i18r status                        Show what's up to date and what's not
+i18r config                        Update provider, model, and API key
+i18r config show                   Show saved config
+i18r config set --provider <p> --key <k>   Save API key non-interactively
 ```
 
 ---
 
 ## How it works
 
-**`i18r init`** scans your project for README files and creates `.i18readme.json`:
+**`i18r init`** scans your project for README files, asks which languages to translate to, which AI provider and model to use, and saves your API key. Creates `.i18readme.json`:
 
 ```json
 {
@@ -65,7 +66,7 @@ i18r config show       Show saved config
 }
 ```
 
-**`i18r sync`** checks modification times — if your `README.md` hasn't changed since the last sync, the translation is skipped. Only what's actually outdated gets re-translated.
+**`i18r sync`** compares a content hash of your `README.md` against the hash stored in each translation. If the content hasn't changed, the translation is skipped — even across git checkouts or file copies that would reset timestamps.
 
 **Each translated file** gets a language switcher bar at the top linking to all other languages.
 
@@ -73,12 +74,14 @@ i18r config show       Show saved config
 
 ## AI providers
 
-| Provider           | Model           | How to get a key                                       |
-| ------------------ | --------------- | ------------------------------------------------------ |
-| Claude _(default)_ | claude-opus-4-6 | [console.anthropic.com](https://console.anthropic.com) |
-| OpenAI             | gpt-4o          | [platform.openai.com](https://platform.openai.com)     |
+| Provider           | Default model              | How to get a key                                       |
+| ------------------ | -------------------------- | ------------------------------------------------------ |
+| Claude _(default)_ | claude-haiku-4-5 (fast)    | [console.anthropic.com](https://console.anthropic.com) |
+| OpenAI             | gpt-4o-mini (fast)         | [platform.openai.com](https://platform.openai.com)     |
 
-Run `i18r config` to pick a provider and save your key. The key is stored in `~/.i18readmerc` on your machine — never in the project.
+You can select a more powerful model (Sonnet, Opus, GPT-4o) during `i18r init` or `i18r config`, or override it for a single run with `--model`.
+
+The key is stored in `~/.i18readmerc` on your machine — never in the project.
 
 ---
 
