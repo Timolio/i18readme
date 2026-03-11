@@ -1,6 +1,6 @@
 {
     "name": "i18readme",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "AI-powered README localization — translates and links README files across languages",
     "main": "src/index.js",
     "bin": {
