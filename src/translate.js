@@ -16,8 +16,9 @@ function stripLangBar(content) {
  * @param {string} targetLang - language name used in the prompt
  * @param {string} providerName - 'claude' | 'openai'
  * @param {string|null} flagKey - key passed via --key CLI flag
+ * @param {string|null} model - model override
  */
-async function translate(text, targetLang, providerName = 'claude', flagKey = null) {
+async function translate(text, targetLang, providerName = 'claude', flagKey = null, model = null) {
   const loader = PROVIDERS[providerName];
   if (!loader) {
     throw new Error(`Unknown provider "${providerName}". Supported: ${SUPPORTED}`);
@@ -29,7 +30,7 @@ async function translate(text, targetLang, providerName = 'claude', flagKey = nu
 
   if (!cleanText) return '';
 
-  return providerTranslate(cleanText, targetLang, apiKey);
+  return providerTranslate(cleanText, targetLang, apiKey, model || undefined);
 }
 
 module.exports = { translate };

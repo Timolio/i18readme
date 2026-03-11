@@ -4,6 +4,23 @@ const os = require('os');
 
 const CONFIG_PATH = path.join(os.homedir(), '.i18readmerc');
 
+const DEFAULT_MODELS = {
+  claude: 'claude-haiku-4-5-20251001',
+  openai: 'gpt-4o-mini',
+};
+
+const PROVIDER_MODELS = {
+  claude: [
+    { value: 'claude-haiku-4-5-20251001', label: 'Haiku', hint: 'fast & cheap (default)' },
+    { value: 'claude-sonnet-4-6', label: 'Sonnet', hint: 'balanced' },
+    { value: 'claude-opus-4-6', label: 'Opus', hint: 'most capable' },
+  ],
+  openai: [
+    { value: 'gpt-4o-mini', label: 'GPT-4o mini', hint: 'fast & cheap (default)' },
+    { value: 'gpt-4o', label: 'GPT-4o', hint: 'more capable' },
+  ],
+};
+
 function readConfig() {
   if (!fs.existsSync(CONFIG_PATH)) return {};
   try {
@@ -45,6 +62,18 @@ function setProvider(provider) {
   writeConfig(config);
 }
 
+function getModel(provider, flagModel) {
+  if (flagModel) return flagModel;
+  const config = readConfig();
+  return config[provider]?.model || DEFAULT_MODELS[provider] || 'claude-haiku-4-5-20251001';
+}
+
+function setModel(provider, model) {
+  const config = readConfig();
+  config[provider] = { ...config[provider], model };
+  writeConfig(config);
+}
+
 function showConfig() {
   const p = require('@clack/prompts');
   const config = readConfig();
@@ -67,4 +96,4 @@ function showConfig() {
   p.note(lines.join('\n'), CONFIG_PATH);
 }
 
-module.exports = { getApiKey, getProvider, setKey, setProvider, showConfig, CONFIG_PATH };
+module.exports = { getApiKey, getProvider, getModel, setKey, setProvider, setModel, showConfig, CONFIG_PATH, DEFAULT_MODELS, PROVIDER_MODELS };

@@ -29,9 +29,9 @@ function injectLangBar(content, bar) {
   return block + '\n\n' + content;
 }
 
-function isOutdated(sourceFile, targetFile) {
+function isOutdated(sourceMtimeMs, targetFile) {
   try {
-    return fs.statSync(sourceFile).mtimeMs > fs.statSync(targetFile).mtimeMs;
+    return sourceMtimeMs > fs.statSync(targetFile).mtimeMs;
   } catch {
     return true;
   }
@@ -39,13 +39,16 @@ function isOutdated(sourceFile, targetFile) {
 
 async function run({
   langs,
+  allLangs,
   readmePath,
   dirName,
   shouldTranslate = false,
   force = false,
   provider = 'claude',
   flagKey = null,
+  model = null,
 }) {
+  allLangs = allLangs || langs;
   const cwd = process.cwd();
   const absReadme = path.resolve(cwd, readmePath);
 
@@ -57,8 +60,12 @@ async function run({
     fs.writeFileSync(absReadme, '', 'utf8');
   }
 
+  // Capture mtime before we touch the file — writing the lang bar must not
+  // make translations look outdated on the next sync.
+  const sourceMtimeMs = fs.statSync(absReadme).mtimeMs;
+
   const mainLang = detectMainLang(readmePath);
-  const allLangs = [mainLang, ...langs.filter(l => l !== mainLang)];
+  allLangs = [mainLang, ...allLangs.filter(l => l !== mainLang)];
   const absDir = path.resolve(cwd, path.dirname(absReadme), dirName);
 
   if (!fs.existsSync(absDir)) {
@@ -79,13 +86,13 @@ async function run({
 
   const mainFromDir = path.relative(absDir, absReadme).replace(/\\/g, '/');
 
-  for (const lang of langs) {
+  for (const lang of langs.filter(l => l !== mainLang)) {
     const filePath = path.join(absDir, `README.${lang}.md`);
     const langName = getLangName(lang);
     const bar = buildLangBar(allLangs, lang, mainFromDir, mainLang);
 
     if (shouldTranslate) {
-      const needsTranslation = force || isOutdated(absReadme, filePath);
+      const needsTranslation = force || isOutdated(sourceMtimeMs, filePath);
 
       if (!needsTranslation) {
         if (fs.existsSync(filePath)) {
@@ -99,7 +106,7 @@ async function run({
       const s = p.spinner();
       s.start(`Translating → ${langName}`);
       try {
-        const translated = await translate(mainContent, langName, provider, flagKey);
+        const translated = await translate(mainContent, langName, provider, flagKey, model);
         fs.writeFileSync(filePath, injectLangBar(translated, bar), 'utf8');
         s.stop(`${langName} — done`);
       } catch (err) {

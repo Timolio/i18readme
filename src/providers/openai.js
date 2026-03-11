@@ -7,7 +7,7 @@ try {
 
 const { SYSTEM_PROMPT, buildUserPrompt } = require('../prompt');
 
-async function translate(text, targetLang, apiKey) {
+async function translate(text, targetLang, apiKey, model = 'gpt-4o-mini') {
   if (!OpenAI) {
     throw new Error(
       'Package openai is not installed.\n' +
@@ -22,7 +22,7 @@ async function translate(text, targetLang, apiKey) {
   const client = new OpenAI.default({ apiKey });
 
   const response = await client.chat.completions.create({
-    model: 'gpt-4o',
+    model,
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: buildUserPrompt(text, targetLang) },

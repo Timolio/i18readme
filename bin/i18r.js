@@ -50,12 +50,19 @@ if (command === 'init') {
 // ─── sync ─────────────────────────────────────────────────────────────────────
 if (command === 'sync') {
   const { sync } = require('../src/commands/sync');
-  const force = args.includes('--force');
+  const forceIndex = args.indexOf('--force');
+  const forceValue = forceIndex !== -1 ? args[forceIndex + 1] : null;
+  const forceLangs = forceValue && !forceValue.startsWith('--')
+    ? forceValue.split(',').map(l => l.trim()).filter(Boolean)
+    : null;
+  const force = forceIndex !== -1;
   const keyIndex = args.indexOf('--key');
   const flagKey = keyIndex !== -1 ? args[keyIndex + 1] : null;
   const providerIndex = args.indexOf('--provider');
   const flagProvider = providerIndex !== -1 ? args[providerIndex + 1] : null;
-  sync({ force, flagKey, flagProvider }).catch(err => { console.error(`\nError: ${err.message}`); process.exit(1); });
+  const modelIndex = args.indexOf('--model');
+  const flagModel = modelIndex !== -1 ? args[modelIndex + 1] : null;
+  sync({ force, forceLangs, flagKey, flagProvider, flagModel }).catch(err => { console.error(`\nError: ${err.message}`); process.exit(1); });
   return;
 }
 
@@ -73,13 +80,15 @@ if (command && !args.includes('--help') && !args.includes('-h')) {
 
 console.log(`
 Usage:
-  i18r init                                  Interactive project setup
-  i18r sync                                  Translate missing/outdated READMEs
-  i18r sync --force                          Retranslate everything
-  i18r sync --provider <p>                   Override provider for this run
-  i18r status                                Show translation status
-  i18r config                                Interactive API key setup
-  i18r config show                           Show current config
-  i18r config set --provider <p> --key <k>   Save API key (non-interactive)
+  i18r init                                        Interactive project setup
+  i18r sync                                        Translate missing/outdated READMEs
+  i18r sync --force                                Retranslate everything
+  i18r sync --force ru,de                          Retranslate specific languages only
+  i18r sync --provider <p>                         Override provider for this run
+  i18r sync --model <m>                            Override model for this run
+  i18r status                                      Show translation status
+  i18r config                                      Update provider, model, and API key
+  i18r config show                                 Show current config
+  i18r config set --provider <p> --key <k>         Save API key (non-interactive)
 `);
 process.exit(command ? 1 : 0);

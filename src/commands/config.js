@@ -1,5 +1,5 @@
 const p = require('@clack/prompts');
-const { getApiKey, setKey, setProvider } = require('../config');
+const { getApiKey, setKey, setProvider, setModel, PROVIDER_MODELS } = require('../config');
 
 async function configInteractive() {
   p.intro('Configuring i18readme');
@@ -13,6 +13,12 @@ async function configInteractive() {
   });
   if (p.isCancel(provider)) { p.cancel('Cancelled.'); process.exit(0); }
 
+  const model = await p.select({
+    message: 'Model',
+    options: PROVIDER_MODELS[provider],
+  });
+  if (p.isCancel(model)) { p.cancel('Cancelled.'); process.exit(0); }
+
   const existing = getApiKey(provider, null);
   const key = await p.password({
     message: `API key for ${provider}`,
@@ -24,6 +30,7 @@ async function configInteractive() {
   if (p.isCancel(key)) { p.cancel('Cancelled.'); process.exit(0); }
 
   setProvider(provider);
+  setModel(provider, model);
   if (key) setKey(provider, key);
 
   p.outro('Config saved · Run "i18r sync" to translate');

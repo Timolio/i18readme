@@ -7,7 +7,7 @@ try {
 
 const { SYSTEM_PROMPT, buildUserPrompt } = require('../prompt');
 
-async function translate(text, targetLang, apiKey) {
+async function translate(text, targetLang, apiKey, model = 'claude-haiku-4-5-20251001') {
   if (!Anthropic) {
     throw new Error(
       'Package @anthropic-ai/sdk is not installed.\n' +
@@ -22,7 +22,7 @@ async function translate(text, targetLang, apiKey) {
   const client = new Anthropic.default({ apiKey });
 
   const stream = client.messages.stream({
-    model: 'claude-opus-4-6',
+    model,
     max_tokens: 8192,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: buildUserPrompt(text, targetLang) }],
