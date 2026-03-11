@@ -1,14 +1,13 @@
 <!-- i18readme -->
-
+<!-- src-hash:bd6dd8bd5f05 -->
 [English](../README.md) | [Русский](README.ru.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [中文](README.zh.md) | **日本語**
-
 <!-- i18readme -->
 
 # i18readme
 
-`README.md` をたった1コマンドで任意の言語に翻訳。Claude または GPT-4o を活用。
+`README.md` を任意の言語に翻訳できるツールです。Claude または GPT-4o を使用しています。
 
-上記の言語バーは、すべてのファイルに自動で挿入されます。README が更新されると、古くなった翻訳だけが再生成されます。
+言語切り替えバーが自動的に各ファイルに挿入されます。README が変更された場合、古くなった翻訳だけが再生成されます。
 
 ---
 
@@ -25,31 +24,31 @@ Node.js 18 以上が必要です。
 ## クイックスタート
 
 ```bash
-# 1. プロジェクトに移動
+# 1. プロジェクトディレクトリに移動
 cd my-project
 
-# 2. セットアップ（対話形式 — 言語・フォルダ・README ファイルを選択）
+# 2. セットアップ（対話形式 — 言語、フォルダ、README ファイルを選択）
 i18r init
 
 # 3. API キーを設定（Claude または OpenAI）
 i18r config
 
-# 4. 翻訳を実行
+# 4. 翻訳実行
 i18r sync
 ```
 
-これだけです。翻訳ファイルは `i18readme/README.ru.md`、`i18readme/README.de.md` などに生成されます。
+これで完了です。翻訳ファイルが `i18readme/README.ru.md`、`i18readme/README.de.md` など に生成されます。
 
 ---
 
-## コマンド一覧
+## コマンド
 
 ```
-i18r init              プロジェクトのセットアップ（対話形式）
-i18r sync              未翻訳・更新が必要なファイルを翻訳
-i18r sync --force      すべてを強制的に再翻訳
-i18r status            翻訳の最新/未更新状況を表示
-i18r config            API キーの追加・変更（対話形式）
+i18r init              プロジェクトをセットアップ（対話形式）
+i18r sync              不足している翻訳と古い翻訳を更新
+i18r sync --force      すべての翻訳を再生成
+i18r status            最新と古い翻訳のステータスを表示
+i18r config            API キーを追加または変更（対話形式）
 i18r config show       保存済みの設定を表示
 ```
 
@@ -57,7 +56,7 @@ i18r config show       保存済みの設定を表示
 
 ## 仕組み
 
-**`i18r init`** はプロジェクト内の README ファイルをスキャンし、`.i18readme.json` を作成します：
+**`i18r init`** はプロジェクトの README ファイルをスキャンし、`.i18readme.json` を作成します：
 
 ```json
 {
@@ -67,20 +66,20 @@ i18r config show       保存済みの設定を表示
 }
 ```
 
-**`i18r sync`** はファイルの更新日時をチェックし、前回の同期以降 `README.md` が変更されていなければ翻訳をスキップします。実際に古くなったものだけが再翻訳されます。
+**`i18r sync`** は更新時刻をチェックします — `README.md` が前回の同期以降に変更されていない場合、翻訳はスキップされます。実際に古くなった部分だけが再翻訳されます。
 
-**各翻訳ファイル** の先頭には、他の言語へのリンクを含む言語切り替えバーが自動挿入されます。
+**各翻訳ファイル** の先頭に、他の言語へのリンクを含む言語切り替えバーが追加されます。
 
 ---
 
 ## AI プロバイダー
 
-| プロバイダー            | モデル          | キーの取得方法                                         |
-| ----------------------- | --------------- | ------------------------------------------------------ |
-| Claude _（デフォルト）_ | claude-opus-4-6 | [console.anthropic.com](https://console.anthropic.com) |
-| OpenAI                  | gpt-4o          | [platform.openai.com](https://platform.openai.com)     |
+| プロバイダー | モデル | キーの取得方法 |
+| ----------- | ------ | ------------ |
+| Claude _(デフォルト)_ | claude-opus-4-6 | [console.anthropic.com](https://console.anthropic.com) |
+| OpenAI | gpt-4o | [platform.openai.com](https://platform.openai.com) |
 
-`i18r config` を実行してプロバイダーを選択し、キーを保存します。キーはローカルマシンの `~/.i18readmerc` に保存され、プロジェクト内には含まれません。
+`i18r config` を実行してプロバイダーを選択し、キーを保存します。キーはマシンの `~/.i18readmerc` に保存されます — プロジェクト内には保存されません。
 
 ---
 

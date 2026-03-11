@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const p = require('@clack/prompts');
-const { translate } = require('./translate');
+const { translate, stripLangBar } = require('./translate');
 const { getLangName } = require('./languages');
 
 function detectMainLang(readmePath) {
@@ -21,17 +22,32 @@ function buildLangBar(allLangs, currentLang, mainReadmePath, mainLang) {
     .join(' | ');
 }
 
-function injectLangBar(content, bar) {
+function hashContent(text) {
+  return crypto.createHash('sha256').update(text).digest('hex').slice(0, 12);
+}
+
+function extractStoredHash(content) {
+  const match = content.match(/<!-- i18readme -->\s*<!-- src-hash:([a-f0-9]+) -->/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Injects the lang bar (and optionally a source hash) into content.
+ * srcHash is stored in translated files only — never in the source README.
+ */
+function injectLangBar(content, bar, srcHash = null) {
   const marker = '<!-- i18readme -->';
-  const block = `${marker}\n${bar}\n${marker}`;
+  const hashLine = srcHash ? `<!-- src-hash:${srcHash} -->\n` : '';
+  const block = `${marker}\n${hashLine}${bar}\n${marker}`;
   const re = /<!-- i18readme -->[\s\S]*?<!-- i18readme -->/;
   if (re.test(content)) return content.replace(re, block);
   return block + '\n\n' + content;
 }
 
-function isOutdated(sourceMtimeMs, targetFile) {
+function isContentChanged(sourceHash, targetFile) {
   try {
-    return sourceMtimeMs > fs.statSync(targetFile).mtimeMs;
+    const stored = extractStoredHash(fs.readFileSync(targetFile, 'utf8'));
+    return stored !== sourceHash;
   } catch {
     return true;
   }
@@ -60,9 +76,8 @@ async function run({
     fs.writeFileSync(absReadme, '', 'utf8');
   }
 
-  // Capture mtime before we touch the file — writing the lang bar must not
-  // make translations look outdated on the next sync.
-  const sourceMtimeMs = fs.statSync(absReadme).mtimeMs;
+  // Hash the clean source content (no lang bar) — used to detect real changes.
+  const sourceHash = hashContent(stripLangBar(mainContent).trim());
 
   const mainLang = detectMainLang(readmePath);
   allLangs = [mainLang, ...allLangs.filter(l => l !== mainLang)];
@@ -72,7 +87,7 @@ async function run({
     fs.mkdirSync(absDir, { recursive: true });
   }
 
-  // Update main README lang bar
+  // Update main README lang bar (no hash stored here — it's the source)
   const mainToDir = path.relative(path.dirname(absReadme), absDir).replace(/\\/g, '/');
   const mainBar = allLangs
     .map(lang => {
@@ -92,12 +107,13 @@ async function run({
     const bar = buildLangBar(allLangs, lang, mainFromDir, mainLang);
 
     if (shouldTranslate) {
-      const needsTranslation = force || isOutdated(sourceMtimeMs, filePath);
+      const needsTranslation = force || isContentChanged(sourceHash, filePath);
 
       if (!needsTranslation) {
         if (fs.existsSync(filePath)) {
           const existing = fs.readFileSync(filePath, 'utf8');
-          fs.writeFileSync(filePath, injectLangBar(existing, bar), 'utf8');
+          // Preserve the stored hash when only updating the bar
+          fs.writeFileSync(filePath, injectLangBar(existing, bar, sourceHash), 'utf8');
         }
         p.log.info(`${langName} — up to date`);
         continue;
@@ -107,7 +123,7 @@ async function run({
       s.start(`Translating → ${langName}`);
       try {
         const translated = await translate(mainContent, langName, provider, flagKey, model);
-        fs.writeFileSync(filePath, injectLangBar(translated, bar), 'utf8');
+        fs.writeFileSync(filePath, injectLangBar(translated, bar, sourceHash), 'utf8');
         s.stop(`${langName} — done`);
       } catch (err) {
         s.stop(`${langName} — failed`, 2);
@@ -116,7 +132,7 @@ async function run({
     } else {
       if (fs.existsSync(filePath)) {
         const existing = fs.readFileSync(filePath, 'utf8');
-        fs.writeFileSync(filePath, injectLangBar(existing, bar), 'utf8');
+        fs.writeFileSync(filePath, injectLangBar(existing, bar, extractStoredHash(existing)), 'utf8');
         p.log.info(`Updated: ${path.relative(cwd, filePath)}`);
       } else {
         fs.writeFileSync(filePath, injectLangBar('', bar), 'utf8');

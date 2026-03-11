@@ -33,4 +33,4 @@ async function translate(text, targetLang, providerName = 'claude', flagKey = nu
   return providerTranslate(cleanText, targetLang, apiKey, model || undefined);
 }
 
-module.exports = { translate };
+module.exports = { translate, stripLangBar };
